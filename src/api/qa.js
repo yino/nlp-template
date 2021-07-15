@@ -7,3 +7,11 @@ export function getList(params) {
         params
     })
 }
+
+export function deleteQa(id) {
+    return request({
+        url: 'question/delete',
+        method: 'get',
+        params: { id: id },
+    })
+}
