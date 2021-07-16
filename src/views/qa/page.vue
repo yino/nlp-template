@@ -50,14 +50,18 @@
       :lock-scroll="false"
       width="60%"
     >
-      <QaForm></QaForm>
+      <QaForm
+        @submitSuccess="submitRollback"
+        :type="dialogType"
+        :id="selectId"
+      ></QaForm>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import { getList, deleteQa } from "@/api/qa";
-import  QaForm  from "@/components/Qa/form.vue";
+import QaForm from "@/components/Qa/form.vue";
 
 export default {
   components: {
@@ -83,6 +87,8 @@ export default {
       dialogStatus: "",
       dialogFormVisible: false,
       dialogTitle: "添加",
+      dialogType: "add",
+      selectId: 0,
     };
   },
   created() {
@@ -102,7 +108,10 @@ export default {
       });
     },
     showInfo(id) {
+      console.log(id);
+      this.selectId = id;
       this.dialogTitle = "详情";
+      this.dialogType = "info";
       this.dialogFormVisible = true;
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
@@ -111,12 +120,16 @@ export default {
         this.$refs["dataForm"].clearValidate();
       });
     },
-    add(){
+    add() {
+      this.dialogType = "add";
       this.dialogTitle = "添加";
       this.dialogFormVisible = true;
+      this.selectId = 0;
     },
     editInfo(id) {
+      this.dialogType = "edit";
       this.dialogTitle = "编辑";
+      this.selectId = id;
     },
     deleteWarn(id) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
@@ -146,6 +159,12 @@ export default {
             message: "已取消删除",
           });
         });
+    },
+    submitRollback(ok) {
+      if (ok) {
+        this.dialogFormVisible = false;
+        this.fetchData(1);
+      }
     },
   },
 };
