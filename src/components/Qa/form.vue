@@ -8,18 +8,21 @@
         />
       </el-form-item>
       <el-form-item label="相似问题">
+
         <el-input
           v-model="slaveQuestion"
           @change="slaveQuestionChange"
           @keyup.enter.native="addSlaveQuestion"
           placeholder="please input question..."
+          v-if="type != 'info' "
         />
+        <div class="sims_question">
+          <el-form-item v-for="item in form.slaveQuestionList" style="margin-top:10px;">
+            <el-input :value="item.question" />
+          </el-form-item>
+        </div>
       </el-form-item>
-      <div style="max-height: 400px; overflow-y: scroll">
-        <el-form-item v-for="item in form.slaveQuestionList">
-          <el-input :value="item.question" />
-        </el-form-item>
-      </div>
+
       <!-- answer -->
       <el-form-item label="答案">
         <el-input
@@ -29,7 +32,9 @@
         />
       </el-form-item>
       <el-form-item v-if="type != 'info'">
-        <el-button type="primary" @click="onSubmit">Create</el-button>
+        <el-button type="primary" @click="onSubmit">{{
+          submitButtonText
+        }}</el-button>
         <el-button @click="onCancel">Cancel</el-button>
       </el-form-item>
     </el-form>
@@ -62,6 +67,7 @@ export default {
         slaveQuestionList: [], // [{"id":1,"question":""}]
       },
       slaveQuestion: "",
+      submitButtonText: "",
     };
   },
   methods: {
@@ -111,8 +117,7 @@ export default {
         edit(data).then((resp) => {
           if (resp["code"] == 200) {
             this.$message("success!");
-            this.resetForm();
-            this.$emit("submitSuccess", true);
+            // this.$emit("submitSuccess", true);
           } else {
             this.$message({
               message: resp.message,
@@ -155,18 +160,26 @@ export default {
         answer: "",
         slaveQuestionList: [], // [{"id":1,"question":""}]
       };
+      this.type = "";
     },
   },
 
   watch: {
     type: {
       immediate: true,
-      handler(val) {},
+      handler(val) {
+        console.log(val);
+        if (val == "edit") {
+          this.submitButtonText = "Update";
+        } else if (val == "add") {
+          this.submitButtonText = "Create";
+        }
+      },
     },
     id: {
       immediate: true,
       handler(val) {
-        console.log(val);
+        console.log("id", val);
         // 获取详情
         if (this.type != "info" && this.type != "edit") {
           return;
@@ -205,6 +218,10 @@ export default {
 <style scoped>
 .line {
   text-align: center;
+}
+.sims_question {
+  max-height: 400px;
+  overflow-y: scroll;
 }
 </style>
 

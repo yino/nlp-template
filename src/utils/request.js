@@ -2,8 +2,7 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
-console.log(process.env.VUE_APP_BASE_API)
-    // create an axios instance
+// create an axios instance
 const service = axios.create({
     baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
@@ -25,7 +24,7 @@ service.interceptors.request.use(
     },
     error => {
         // do something with request error
-        console.log(error) // for debug
+
         return Promise.reject(error)
     }
 )
@@ -72,7 +71,7 @@ service.interceptors.response.use(
         }
     },
     error => {
-        console.log('err' + error) // for debug
+        // console.log('err' + error) // for debug
         Message({
             message: error.message,
             type: 'error',

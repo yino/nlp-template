@@ -108,17 +108,10 @@ export default {
       });
     },
     showInfo(id) {
-      console.log(id);
       this.selectId = id;
       this.dialogTitle = "详情";
       this.dialogType = "info";
       this.dialogFormVisible = true;
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
     },
     add() {
       this.dialogType = "add";
@@ -127,9 +120,10 @@ export default {
       this.selectId = 0;
     },
     editInfo(id) {
-      this.dialogType = "edit";
-      this.dialogTitle = "编辑";
       this.selectId = id;
+      this.dialogTitle = "编辑";
+      this.dialogType = "edit";
+      this.dialogFormVisible = true;
     },
     deleteWarn(id) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
