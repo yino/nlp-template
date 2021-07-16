@@ -64,20 +64,12 @@ export const constantRoutes = [{
         name: 'qa',
         meta: { title: 'Qa', icon: 'el-icon-s-help' },
         children: [{
-                path: 'page',
-                name: 'page',
-                component: () =>
-                    import ('@/views/qa/page'),
-                meta: { title: 'Qa', icon: 'table' }
-            },
-            {
-                path: 'add qa',
-                name: 'add',
-                component: () =>
-                    import ('@/views/qa/form'),
-                meta: { title: 'form', icon: 'form' }
-            }
-        ]
+            path: 'page',
+            name: 'page',
+            component: () =>
+                import ('@/views/qa/page'),
+            meta: { title: 'Qa', icon: 'table' }
+        }]
     },
 
     // 404 page must be placed at the end !!!
