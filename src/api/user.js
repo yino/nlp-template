@@ -47,3 +47,10 @@ export function akDelete(id) {
         params: { id: id },
     })
 }
+export function register(data) {
+    return request({
+        url: '/register',
+        method: 'post',
+        data
+    })
+}

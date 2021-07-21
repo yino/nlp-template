@@ -9,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">Register Form</h3>
       </div>
 
       <el-form-item prop="username">
@@ -17,16 +17,29 @@
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="name"
+          v-model="loginForm.name"
+          placeholder="Name"
+          name="name"
           type="text"
           tabindex="1"
           auto-complete="on"
         />
       </el-form-item>
-
+      <el-form-item prop="mobile">
+        <span class="svg-container">
+          <i class="el-icon-mobile-phone"></i>
+        </span>
+        <el-input
+          ref="mobile"
+          v-model="loginForm.mobile"
+          placeholder="Mobile"
+          name="mobile"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
@@ -54,21 +67,20 @@
         type="primary"
         style="width: 100%; margin-bottom: 30px"
         @click.native.prevent="handleLogin"
-        >Login</el-button
+        >Register</el-button
       >
 
-      <div class="tips">
-        <el-button type="info" @click="JumpRegister()" circle>注册</el-button>
-      </div>
+      <div class="tips"></div>
     </el-form>
   </div>
 </template>
 
 <script>
 import { validUsername } from "@/utils/validate";
+import { register } from "@/api/user";
 
 export default {
-  name: "Login",
+  name: "Register",
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
@@ -86,11 +98,15 @@ export default {
     };
     return {
       loginForm: {
-        username: "",
+        name: "",
+        mobile: "",
         password: "",
       },
       loginRules: {
-        username: [
+        name: [
+          { required: true, trigger: "blur", validator: validateUsername },
+        ],
+        mobile: [
           { required: true, trigger: "blur", validator: validateUsername },
         ],
         password: [
@@ -125,23 +141,20 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loading = true;
-          this.$store
-            .dispatch("user/login", this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || "/" });
-              this.loading = false;
-            })
-            .catch(() => {
-              this.loading = false;
-            });
+          register(this.loginForm).then((resp) => {
+            if (resp["code"] == 200) {
+              this.$message("success");
+              this.$router.push({ path: "/login" });
+              return;
+            }
+            return false;
+          });
+          this.loading = false;
         } else {
           console.log("error submit!!");
           return false;
         }
       });
-    },
-    JumpRegister() {
-      console.log(this.$router.push({ path: "/register" }));
     },
   },
 };
