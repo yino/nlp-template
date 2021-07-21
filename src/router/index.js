@@ -58,17 +58,32 @@ export const constantRoutes = [{
     },
 
     {
+        path: '/ak',
+        component: Layout,
+        redirect: '/ak/page',
+        name: 'ak',
+        meta: { title: 'Ak', icon: 'el-icon-lollipop' },
+        children: [{
+            path: 'page',
+            name: 'page',
+            component: () =>
+                import ('@/views/ak/page'),
+            meta: { title: 'Ak', icon: 'el-icon-lollipop' }
+        }]
+    },
+
+    {
         path: '/qa',
         component: Layout,
         redirect: '/qa/page',
         name: 'qa',
-        meta: { title: 'Qa', icon: 'el-icon-s-help' },
+        meta: { title: 'Qa', icon: 'el-icon-question' },
         children: [{
             path: 'page',
             name: 'page',
             component: () =>
                 import ('@/views/qa/page'),
-            meta: { title: 'Qa', icon: 'table' }
+            meta: { title: 'Qa', icon: 'el-icon-question' }
         }]
     },
 

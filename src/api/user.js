@@ -18,7 +18,32 @@ export function getInfo(token) {
 
 export function logout() {
     return request({
-        url: '/vue-admin-template/user/logout',
+        url: '/user/logout',
         method: 'post'
+    })
+}
+
+export function akPage(params) {
+    return request({
+        url: '/user/ak/page',
+        method: 'get',
+        params
+    })
+}
+
+export function akCreate(data) {
+    return request({
+        url: '/user/ak/add',
+        method: 'POST',
+        data
+    })
+}
+
+
+export function akDelete(id) {
+    return request({
+        url: '/user/ak/delete',
+        method: 'get',
+        params: { id: id },
     })
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-row style="margin: 10px 0">
-      <el-button type="primary" plain @click="add()">添加问题</el-button>
+      <el-button type="primary" plain @click="add()">创建Ak</el-button>
     </el-row>
     <!-- table -->
     <el-table
@@ -14,15 +14,12 @@
     >
       <el-table-column align="center" label="ID" width="95" prop="id">
       </el-table-column>
-      <el-table-column label="Question" prop="question"></el-table-column>
+      <el-table-column label="Ak" prop="app_key"></el-table-column>
+      <el-table-column label="As" prop="app_secret"></el-table-column>
+      <el-table-column label="Type" prop="type"></el-table-column>
+      <el-table-column label="use num" prop="req_num"></el-table-column>
       <el-table-column align="center" label="Actions" width="250">
         <template slot-scope="scope">
-          <el-button @click="showInfo(scope.row.id)" type="info" size="small"
-            >查看</el-button
-          >
-          <el-button type="primary" size="small" @click="editInfo(scope.row.id)"
-            >编辑</el-button
-          >
           <el-button
             type="danger"
             size="small"
@@ -50,22 +47,22 @@
       :lock-scroll="false"
       width="60%"
     >
-      <QaForm
+      <AkForm
         @submitSuccess="submitRollback"
         :type="dialogType"
         :id="selectId"
-      ></QaForm>
+      ></AkForm>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getList, deleteQa } from "@/api/qa";
-import QaForm from "@/components/Qa/form.vue";
+import { akPage, akDelete } from "@/api/user";
+import AkForm from "@/components/Ak/form.vue";
 
 export default {
   components: {
-    QaForm,
+    AkForm,
   },
   filters: {
     statusFilter(status) {
@@ -101,17 +98,17 @@ export default {
     fetchData(page = 1) {
       this.page = page;
       this.listLoading = true;
-      getList({ page: page, pageSize: this.pageSize }).then((response) => {
-        this.list = response.data.Data;
-        this.listLoading = false;
-        this.total = response.data.total;
+      akPage({ page: page, pageSize: this.pageSize }).then((response) => {
+        if (response.data != null) {
+          this.list = response.data.Data;
+          this.listLoading = false;
+          this.total = response.data.total;
+        } else {
+          this.list = [];
+          this.total = 0;
+          this.listLoading = false;
+        }
       });
-    },
-    showInfo(id) {
-      this.selectId = id;
-      this.dialogTitle = "详情";
-      this.dialogType = "info";
-      this.dialogFormVisible = true;
     },
     add() {
       this.dialogType = "add";
@@ -119,12 +116,7 @@ export default {
       this.dialogFormVisible = true;
       this.selectId = 0;
     },
-    editInfo(id) {
-      this.selectId = id;
-      this.dialogTitle = "编辑";
-      this.dialogType = "edit";
-      this.dialogFormVisible = true;
-    },
+
     deleteWarn(id) {
       this.$confirm("此操作将永久删除该数据, 是否继续?", "提示", {
         confirmButtonText: "确定",
@@ -132,7 +124,7 @@ export default {
         type: "warning",
       })
         .then(() => {
-          deleteQa(id).then((resp) => {
+          akDelete(id).then((resp) => {
             if (resp.code == 200) {
               this.$message({
                 type: "success",
