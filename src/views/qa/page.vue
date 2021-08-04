@@ -2,6 +2,8 @@
   <div class="app-container">
     <el-row style="margin: 10px 0">
       <el-button type="primary" plain @click="add()">添加问题</el-button>
+      <el-button type="info" plain @click="trainModel()" :loading="trainButton.loading">训练模型</el-button>
+      <el-button type="info" plain :disabled="qaModelStatus">测试对话</el-button>
     </el-row>
     <!-- table -->
     <el-table
@@ -60,8 +62,10 @@
 </template>
 
 <script>
-import { getList, deleteQa } from "@/api/qa";
+import { getList, deleteQa ,train} from "@/api/qa";
 import QaForm from "@/components/Qa/form.vue";
+import { getInfo } from '@/api/user';
+import { getToken } from '@/utils/auth';
 
 export default {
   components: {
@@ -89,10 +93,15 @@ export default {
       dialogTitle: "添加",
       dialogType: "add",
       selectId: 0,
+      qaModelStatus: true,
+      trainButton: {
+        loading: false
+      },
     };
   },
   created() {
     this.fetchData();
+    this.checkIsQaModel()
   },
   methods: {
     handleCurrentChange(page) {
@@ -160,6 +169,28 @@ export default {
         this.fetchData(1);
       }
     },
+    checkIsQaModel(){
+      getInfo(getToken()).then((res=>{
+          if(res.data.qa_model_status == 1){
+            this.qaModelStatus = false;
+          }
+      }));
+    },
+    trainModel(){
+      this.trainButton.loading = true
+      train().then((res)=>{
+        if(res.code == 200){
+           this.$message("success!");
+           this.qaModelStatus = false;
+        }else{
+           this.$message({
+              message: resp.message,
+              type: "error",
+            });
+        }
+        this.trainButton.loading = false
+      })
+    }
   },
 };
 </script>

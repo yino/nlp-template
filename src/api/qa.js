@@ -42,3 +42,11 @@ export function info(id) {
         params: { id, id }
     })
 }
+
+// 详情
+export function train() {
+    return request({
+        url: "question/train",
+        method: "get"
+    })
+}

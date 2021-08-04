@@ -36,7 +36,7 @@ const actions = {
                 const { data } = response
                 commit('SET_TOKEN', data.token)
                 setToken(data.token)
-                resolve()
+                resolve(data)
             }).catch(error => {
                 reject(error)
             })
@@ -53,7 +53,7 @@ const actions = {
                     return reject('Verification failed, please Login again.')
                 }
 
-                data["avatar"] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+                data["avatar"] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif";
                 const { name, avatar } = data
 
                 commit('SET_NAME', name)
