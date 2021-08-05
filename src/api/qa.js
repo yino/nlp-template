@@ -50,3 +50,13 @@ export function train() {
         method: "get"
     })
 }
+
+// match
+
+export function match(question){
+    return request({
+        url: "question/match",
+        method: "get",
+        params: { question, question }
+    })
+}
