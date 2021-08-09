@@ -52,7 +52,6 @@ export function train() {
 }
 
 // match
-
 export function match(question){
     return request({
         url: "question/match",
@@ -60,3 +59,12 @@ export function match(question){
         params: { question, question }
     })
 }
+
+// questionTotal
+export function questionTotal(){
+    return request({
+        url: "question/total",
+        method: "get"
+    })
+}
+
