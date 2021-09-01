@@ -67,13 +67,13 @@
     </el-row>
 
     <el-row :gutter="32" class="panel-group card">
-       <el-col :xs="24" :sm="24" :lg="8">
+       <el-col :xs="32" :sm="24" :lg="12">
         <div class="chart-wrapper">
             <div id="qpsCharts">
             </div>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :lg="8">
+      <el-col :xs="32" :sm="32" :lg="12">
         <div class="requestType">
          <div id="requestTypeCharts"></div>
         </div>
@@ -87,6 +87,7 @@
 import { mapGetters } from 'vuex'
 import CountTo from 'vue-count-to'
 import {questionTotal} from '@/api/qa'
+import {qpsList} from '@/api/api_log'
 import * as echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 
@@ -112,20 +113,20 @@ export default {
     },
     
     // question total
-    initQaQuestionTotal(){
-      questionTotal().then((res)=>{
+    async initQaQuestionTotal(){
+      await questionTotal().then((res)=>{
         if(res.code == 200){
           this.qa.questionTotal = res.data.Total
         }
       })
     },
-    initRequestNumCharts(){
+    async initRequestNumCharts(){
       let requestNumEcharts = echarts.init(document.getElementById('requestNumCharts'));
       let requestNum=[100, 120, 161, 134, 105, 160, 165],
           validRequestNum=[120, 82, 91, 154, 162, 140, 145]
 
       let dataArr = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-      requestNumEcharts.setOption({
+      await requestNumEcharts.setOption({
         title: {
           text: '最近七天请求量'
         },
@@ -196,7 +197,7 @@ export default {
         }]
       })
     },
-    initQpsCharta(){
+    async initQpsCharta(){
       function randomData(value) {
           now = new Date(+now + oneDay);
           value = value + Math.random() * 21 - 10;
@@ -217,6 +218,12 @@ export default {
           data.push(randomData(value));
       }
 
+      new Date(new Date().toLocaleDateString()).getTime()
+      const start = parseInt(new Date(new Date().setHours(0, 0, 0, 0)).getTime()/1000);
+      const end = parseInt(new Date(new Date().setHours(23, 59, 59, 59)).getTime()/1000,0);
+      await qpsList({startTime:start, endTime:end}).then(res=>{
+          console.log(res);
+      });
       let qpsEcharts = echarts.init(document.getElementById('qpsCharts'));
       qpsEcharts.setOption({
           title: {
@@ -255,9 +262,9 @@ export default {
           }]
       })
     },
-    initRequestTypeCharts(){
+    async initRequestTypeCharts(){
       let requestTypeEcharts = echarts.init(document.getElementById('requestTypeCharts'))
-      requestTypeEcharts.setOption({
+      await requestTypeEcharts.setOption({
           title: {
               text: '天气情况统计',
               subtext: '虚构数据',
