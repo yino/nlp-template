@@ -198,33 +198,22 @@ export default {
       })
     },
     async initQpsCharta(){
-      function randomData(value) {
-          now = new Date(+now + oneDay);
-          value = value + Math.random() * 21 - 10;
-          return {
-              name: now.toString(),
-              value: [
-                  [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-                  Math.round(value)
-              ]
-          };
-      }
-
       var data = [];
-      var now = +new Date(1997, 9, 3);
-      var oneDay = 24 * 3600 * 1000;
-      var value = Math.random() * 1000;
-      for (var i = 0; i < 1000; i++) {
-          data.push(randomData(value));
-      }
-
-      new Date(new Date().toLocaleDateString()).getTime()
       const start = parseInt(new Date(new Date().setHours(0, 0, 0, 0)).getTime()/1000);
-      const end = parseInt(new Date(new Date().setHours(23, 59, 59, 59)).getTime()/1000,0);
+      const end = parseInt(new Date(new Date().getTime())/1000,0);
       await qpsList({startTime:start, endTime:end}).then(res=>{
-          console.log(res);
+          res.data.forEach(val => {
+              let item = {
+                name: val.datetime,
+                value: [
+                    val.datetime,
+                    val.total,
+                ]
+            };  
+            data.push(item);
+          });
       });
-      let qpsEcharts = echarts.init(document.getElementById('qpsCharts'));
+      var qpsEcharts = echarts.init(document.getElementById('qpsCharts'));
       qpsEcharts.setOption({
           title: {
               text: 'qps'
@@ -234,7 +223,7 @@ export default {
               formatter: function (params) {
                   params = params[0];
                   var date = new Date(params.name);
-                  return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
+                  return date.getHours() + ':' + date.getSeconds();
               },
               axisPointer: {
                   animation: false
@@ -261,6 +250,27 @@ export default {
               data: data
           }]
       })
+    
+      setInterval(function(){
+       
+        let endTime  = parseInt(new Date(new Date().getTime())/1000,0);
+        qpsList({startTime:endTime-1, endTime:endTime}).then(res=>{          
+          let item = {
+              name: res.data[1].datetime,
+              value: [
+                  res.data[1].datetime,
+                  res.data[1].total,
+              ]
+          };  
+          data.shift();
+          data.push(item);
+        });
+        qpsEcharts.setOption({
+             series: [{
+              data: data
+            }]
+          })
+      }, 1000);
     },
     async initRequestTypeCharts(){
       let requestTypeEcharts = echarts.init(document.getElementById('requestTypeCharts'))
