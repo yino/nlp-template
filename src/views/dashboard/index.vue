@@ -199,8 +199,8 @@ export default {
     },
     async initQpsCharta(){
       var data = [];
-      const start = parseInt(new Date(new Date().setHours(0, 0, 0, 0)).getTime()/1000);
       const end = parseInt(new Date(new Date().getTime())/1000,0);
+      const start = end-(3600*0.5)
       await qpsList({startTime:start, endTime:end}).then(res=>{
           res.data.forEach(val => {
               let item = {
@@ -223,7 +223,7 @@ export default {
               formatter: function (params) {
                   params = params[0];
                   var date = new Date(params.name);
-                  return date.getHours() + ':' + date.getSeconds();
+                  return date.getHours() + ':'+date.getMinutes()+':' + date.getSeconds();
               },
               axisPointer: {
                   animation: false
@@ -254,22 +254,24 @@ export default {
       setInterval(function(){
        
         let endTime  = parseInt(new Date(new Date().getTime())/1000,0);
-        qpsList({startTime:endTime-1, endTime:endTime}).then(res=>{          
+        qpsList({startTime:endTime-1, endTime:endTime}).then(res=>{         
           let item = {
               name: res.data[1].datetime,
               value: [
-                  res.data[1].datetime,
-                  res.data[1].total,
+                  res.data[0].datetime,
+                  res.data[0].total,
               ]
-          };  
+          };
           data.shift();
           data.push(item);
+          console.log(res.data[0].datetime, res.data[0].total);
         });
         qpsEcharts.setOption({
              series: [{
               data: data
             }]
           })
+        
       }, 1000);
     },
     async initRequestTypeCharts(){
