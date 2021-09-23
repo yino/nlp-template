@@ -27,7 +27,7 @@
               <div class="card-panel-text">
                 请求量
               </div>
-              <count-to :start-val="0" :end-val="qa.questionTotal" :duration="3000" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="requestNum" :duration="3000" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -41,7 +41,7 @@
               <div class="card-panel-text">
                 有效请求量
               </div>
-              <count-to :start-val="0" :end-val="qa.questionTotal" :duration="3000" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="validRequestNum" :duration="3000" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -56,7 +56,7 @@
               <div class="card-panel-text">
                 峰值qps
               </div>
-              <count-to :start-val="0" :end-val="qps" :duration="3000" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="qpsPeak" :duration="3000" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -87,7 +87,7 @@
 import { mapGetters } from 'vuex'
 import CountTo from 'vue-count-to'
 import {questionTotal} from '@/api/qa'
-import {qpsList} from '@/api/api_log'
+import {qpsList,requestNum,qpsPeak,getSevenDaysRequestNumList} from '@/api/api_log'
 import * as echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 
@@ -104,7 +104,9 @@ export default {
       qa:{
         questionTotal:0
       },
-      qps:1,
+      requestNum:0,
+      validRequestNum:0,
+      qpsPeak:0,
     }
   },
   methods: {
@@ -122,16 +124,29 @@ export default {
     },
     async initRequestNumCharts(){
       let requestNumEcharts = echarts.init(document.getElementById('requestNumCharts'));
-      let requestNum=[100, 120, 161, 134, 105, 160, 165],
-          validRequestNum=[120, 82, 91, 154, 162, 140, 145]
+      let requestNum=[],
+          validRequestNum=[],
+          dateArr = []
 
-      let dataArr = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-      await requestNumEcharts.setOption({
+      let endTime  = parseInt(new Date(new Date().getTime())/1000,0),
+           startTime = endTime-(7*24*3600)
+      await getSevenDaysRequestNumList({endTime,startTime}).then(res=>{
+          if(res.code == 200){
+              let i = 0;
+              res.data.data.all.forEach((val)=>{
+                    requestNum.push(val.total)
+                    dateArr.push(val.datetime)
+                    validRequestNum.push(res.data.data.valid[i].total)
+                    i++
+              })
+          }
+      })
+      requestNumEcharts.setOption({
         title: {
           text: '最近七天请求量'
         },
         xAxis: {
-          data: dataArr,
+          data: dateArr,
           boundaryGap: false,
           axisTick: {
             show: false
@@ -274,6 +289,7 @@ export default {
         
       }, 1000);
     },
+    // 
     async initRequestTypeCharts(){
       let requestTypeEcharts = echarts.init(document.getElementById('requestTypeCharts'))
       await requestTypeEcharts.setOption({
@@ -318,13 +334,33 @@ export default {
               }
           ]
       })
-    }
+    },
+    // 获取 请求量，有效请求量
+    async initRequestNum(){
+      await requestNum().then(res=>{
+        if(res.code == 200){
+          this.requestNum = res.data.RequestTotal
+          this.validRequestNum = res.data.ValidTotal
+        }
+      });
+    },
+    // 获取qps峰值
+    async initQPSPeak(){
+      await qpsPeak().then(res=>{
+        if(res.code == 200){
+          this.qpsPeak = res.data.QPSPeak
+        }
+      })
+    },
+
   },
   mounted(){
     this.initQaQuestionTotal()
     this.initRequestNumCharts()
     this.initQpsCharta()
     this.initRequestTypeCharts()
+    this.initRequestNum()
+    this.initQPSPeak()
   }
 }
 </script>

@@ -8,3 +8,28 @@ export function qpsList(params) {
         params
     })
 }
+
+export function requestNum(params) {
+    return request({
+        url: 'stat/getReqNum',
+        method: 'get',
+        params
+    })
+}
+
+export function qpsPeak(params) {
+    return request({
+        url: 'stat/getQPSPeak',
+        method: 'get',
+        params
+    })
+}
+
+
+export function getSevenDaysRequestNumList(params) {
+    return request({
+        url: 'stat/getSevenDaysRequestNumList',
+        method: 'get',
+        params
+    })
+}
