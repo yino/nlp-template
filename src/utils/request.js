@@ -8,7 +8,6 @@ const service = axios.create({
     // withCredentials: true, // send cookies when cross-domain requests
     timeout: 5000 // request timeout
 })
-
 // request interceptor
 service.interceptors.request.use(
     config => {
@@ -51,9 +50,9 @@ service.interceptors.response.use(
                 type: 'error',
                 duration: 5 * 1000
             })
-
             // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
             if (res.code === 4002) {
+            
                 // to re-login
                 MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
                     confirmButtonText: 'Re-Login',
@@ -63,8 +62,9 @@ service.interceptors.response.use(
                     store.dispatch('user/resetToken').then(() => {
                         location.reload()
                     })
-                })
+                });
             }
+
             return Promise.reject(new Error(res.message || 'Error'))
         } else {
             return res
